@@ -4,6 +4,8 @@
 
 package br.com.ifba.servidor;
 
+import br.com.ifba.servidor.service.ServidorService;
+
 /**
  *
  * @author Divida Ativa
@@ -11,6 +13,6 @@ package br.com.ifba.servidor;
 public class Servidor {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        new ServidorService();
     }
 }

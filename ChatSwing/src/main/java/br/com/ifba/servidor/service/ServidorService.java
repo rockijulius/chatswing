@@ -4,6 +4,8 @@
  */
 package br.com.ifba.servidor.service;
 
+import br.com.ifba.cliente.bean.ChatMessage;
+import br.com.ifba.cliente.bean.ChatMessage.Action;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -40,23 +42,59 @@ public class ServidorService {
     }
 
     private class ListenerSocket implements Runnable {
-        
+
         private ObjectOutputStream output;
         private ObjectInputStream input;
-        
-        public ListenerSocket (Socket socket){
+
+        public ListenerSocket(Socket socket) {
             try {
                 this.output = new ObjectOutputStream(socket.getOutputStream());
                 this.input = new ObjectInputStream(socket.getInputStream());
             } catch (IOException ex) {
                 Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
-            }            
+            }
         }
-        
+
         @Override
         public void run() {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+            ChatMessage message = null;
+
+            try {
+                while ((message = (ChatMessage) input.readObject()) != null) {
+                    Action action = message.getAction();
+
+                    if (action.equals(Action.CONNECT)) {
+                        connect(message, output);
+                    } else if (action.equals(Action.DISCONNECT)) {
+
+                    } else if (action.equals(Action.SENDO_ONE)) {
+
+                    } else if (action.equals(Action.SEND_ALL)) {
+
+                    } else if (action.equals(Action.USERS_ONINE)) {
+
+                    }                    
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
     }
+
+    private void connect(ChatMessage message, ObjectOutputStream output) {
+        sendOne(message, output);
+      
+    }
+
+    private void sendOne(ChatMessage message, ObjectOutputStream output) {
+        try {
+            output.writeObject(message);
+        } catch (IOException ex) {
+            Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
 }
