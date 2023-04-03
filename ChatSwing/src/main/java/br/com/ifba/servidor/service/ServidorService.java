@@ -28,7 +28,7 @@ public class ServidorService {
 
     public ServidorService() {
         try {
-            serverSocket = new ServerSocket(5555);
+            serverSocket = new ServerSocket(12345);
 
             while (true) {
                 socket = serverSocket.accept();
