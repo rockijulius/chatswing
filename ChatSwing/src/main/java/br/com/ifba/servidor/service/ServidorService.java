@@ -64,16 +64,19 @@ public class ServidorService {
                     Action action = message.getAction();
 
                     if (action.equals(Action.CONNECT)) {
-                        connect(message, output);
+                        boolean isConnect = connect(message, output);
+                        if (isConnect) {
+                            mapOnlines.put(message.getName(), output);
+                        }
                     } else if (action.equals(Action.DISCONNECT)) {
-
+                        disconnect(message, output);
                     } else if (action.equals(Action.SENDO_ONE)) {
 
                     } else if (action.equals(Action.SEND_ALL)) {
 
                     } else if (action.equals(Action.USERS_ONINE)) {
 
-                    }                    
+                    }
                 }
             } catch (IOException ex) {
                 Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
@@ -84,9 +87,35 @@ public class ServidorService {
 
     }
 
-    private void connect(ChatMessage message, ObjectOutputStream output) {
-        sendOne(message, output);
-      
+    private boolean connect(ChatMessage message, ObjectOutputStream output) {
+        if (mapOnlines.size() == 0) {
+            message.setText("YES");
+            sendOne(message, output);
+            return true;
+        }
+
+        for (Map.Entry<String, ObjectOutputStream> kv : mapOnlines.entrySet()) {
+            if (kv.getKey().equals(message.getName())) {
+                message.setText("NO");
+                sendOne(message, output);
+                return false;
+            } else {
+                message.setText("YES");
+                sendOne(message, output);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void disconnect(ChatMessage message, ObjectOutputStream output) {
+        mapOnlines.remove(message.getName());
+
+        message.setText("bye");
+        message.setAction(Action.SENDO_ONE);
+        sendAll(message, output);
+        System.out.println(message.getName() + " saiu da sala.");
     }
 
     private void sendOne(ChatMessage message, ObjectOutputStream output) {
@@ -97,4 +126,7 @@ public class ServidorService {
         }
     }
 
+    private void sendAll(ChatMessage message, ObjectOutputStream output) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
