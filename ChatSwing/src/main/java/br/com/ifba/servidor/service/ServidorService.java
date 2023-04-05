@@ -71,14 +71,15 @@ public class ServidorService {
                     } else if (action.equals(Action.DISCONNECT)) {
                         disconnect(message, output);
                     } else if (action.equals(Action.SENDO_ONE)) {
-
+                        sendOne(message, output);
                     } else if (action.equals(Action.SEND_ALL)) {
-
+                        sendAll(message);
                     } else if (action.equals(Action.USERS_ONINE)) {
 
                     }
                 }
             } catch (IOException ex) {
+                disconnect(message, output);
                 Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
@@ -112,9 +113,9 @@ public class ServidorService {
     private void disconnect(ChatMessage message, ObjectOutputStream output) {
         mapOnlines.remove(message.getName());
 
-        message.setText("bye");
+        message.setText("deixou o chat!");
         message.setAction(Action.SENDO_ONE);
-        sendAll(message, output);
+        sendAll(message);
         System.out.println(message.getName() + " saiu da sala.");
     }
 
@@ -126,7 +127,15 @@ public class ServidorService {
         }
     }
 
-    private void sendAll(ChatMessage message, ObjectOutputStream output) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    private void sendAll(ChatMessage message) {
+        for (Map.Entry<String, ObjectOutputStream> kv : mapOnlines.entrySet()){
+            if (kv.getKey().equals(message.getName())){
+                try {
+                    kv.getValue().writeObject(message);
+                } catch (IOException ex) {
+                    Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }
 }

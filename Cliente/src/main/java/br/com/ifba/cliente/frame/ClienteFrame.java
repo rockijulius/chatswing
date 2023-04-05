@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Divida Ativa
+ * @author rocki.julius
  */
 public class ClienteFrame extends javax.swing.JFrame {
 
@@ -101,7 +101,7 @@ public class ClienteFrame extends javax.swing.JFrame {
                 btnEnviar.setEnabled(false);
                 btnLimpar.setEnabled(false);
                 btnAtualizar.setEnabled(false);
-                
+
                 JOptionPane.showMessageDialog(null, "Você foi desconectado do chat.");
             } catch (IOException ex) {
                 Logger.getLogger(ClienteFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -109,7 +109,7 @@ public class ClienteFrame extends javax.swing.JFrame {
         }
 
         private void receive(ChatMessage message) {
-
+            txtConversa.append(message.getName() + " diz: " + message.getText() + "\n");
         }
 
         private void refreshOnlines(ChatMessage message) {
@@ -335,7 +335,9 @@ public class ClienteFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_btnConectarActionPerformed
 
     private void btnSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSairActionPerformed
-        
+        this.message.setAction(Action.DISCONNECT);
+        this.service.send(message);
+       // disconnect(message);
     }//GEN-LAST:event_btnSairActionPerformed
 
     private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
