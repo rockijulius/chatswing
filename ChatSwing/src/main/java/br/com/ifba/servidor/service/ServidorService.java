@@ -12,7 +12,9 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +31,8 @@ public class ServidorService {
     public ServidorService() {
         try {
             serverSocket = new ServerSocket(12345);
+
+            System.out.println("Servidor online.");
 
             while (true) {
                 socket = serverSocket.accept();
@@ -67,20 +71,21 @@ public class ServidorService {
                         boolean isConnect = connect(message, output);
                         if (isConnect) {
                             mapOnlines.put(message.getName(), output);
+                            sendOnlines();
                         }
                     } else if (action.equals(Action.DISCONNECT)) {
                         disconnect(message, output);
+                        sendOnlines();
+                        return;
                     } else if (action.equals(Action.SENDO_ONE)) {
-                        sendOne(message, output);
+                        sendOne(message);
                     } else if (action.equals(Action.SEND_ALL)) {
                         sendAll(message);
-                    } else if (action.equals(Action.USERS_ONINE)) {
-
                     }
                 }
             } catch (IOException ex) {
                 disconnect(message, output);
-                Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
+                sendOnlines();
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -91,18 +96,18 @@ public class ServidorService {
     private boolean connect(ChatMessage message, ObjectOutputStream output) {
         if (mapOnlines.size() == 0) {
             message.setText("YES");
-            sendOne(message, output);
+            send(message, output);
             return true;
         }
 
         for (Map.Entry<String, ObjectOutputStream> kv : mapOnlines.entrySet()) {
             if (kv.getKey().equals(message.getName())) {
                 message.setText("NO");
-                sendOne(message, output);
+                send(message, output);
                 return false;
             } else {
                 message.setText("YES");
-                sendOne(message, output);
+                send(message, output);
                 return true;
             }
         }
@@ -119,7 +124,7 @@ public class ServidorService {
         System.out.println(message.getName() + " saiu da sala.");
     }
 
-    private void sendOne(ChatMessage message, ObjectOutputStream output) {
+    private void send(ChatMessage message, ObjectOutputStream output) {
         try {
             output.writeObject(message);
         } catch (IOException ex) {
@@ -127,14 +132,49 @@ public class ServidorService {
         }
     }
 
-    private void sendAll(ChatMessage message) {
-        for (Map.Entry<String, ObjectOutputStream> kv : mapOnlines.entrySet()){
-            if (kv.getKey().equals(message.getName())){
+    private void sendOne(ChatMessage message) {
+        for (Map.Entry<String, ObjectOutputStream> kv : mapOnlines.entrySet()) {
+            if (kv.getKey().equals(message.getNameReserved())) {
                 try {
                     kv.getValue().writeObject(message);
                 } catch (IOException ex) {
                     Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+        }
+
+    }
+
+    private void sendAll(ChatMessage message) {
+        for (Map.Entry<String, ObjectOutputStream> kv : mapOnlines.entrySet()) {
+            if (kv.getKey().equals(message.getName())) {
+                message.setAction(Action.SENDO_ONE);
+                try {
+                    kv.getValue().writeObject(message);
+                } catch (IOException ex) {
+                    Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+
+    private void sendOnlines() {
+        Set<String> setNames = new HashSet<String>();
+
+        for (Map.Entry<String, ObjectOutputStream> kv : mapOnlines.entrySet()) {
+            setNames.add(kv.getKey());
+        }
+
+        ChatMessage message = new ChatMessage();
+        message.setAction(Action.USERS_ONINE);
+        message.setSetOnlines(setNames);
+
+        for (Map.Entry<String, ObjectOutputStream> kv : mapOnlines.entrySet()) {
+            message.setName((kv.getKey()));
+            try {
+                kv.getValue().writeObject(message);
+            } catch (IOException ex) {
+                Logger.getLogger(ServidorService.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
