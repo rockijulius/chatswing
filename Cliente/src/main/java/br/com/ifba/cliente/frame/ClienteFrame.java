@@ -23,9 +23,9 @@ import javax.swing.ListSelectionModel;
  */
 public class ClienteFrame extends javax.swing.JFrame {
 
-    private Socket socket;
+    private Socket socket = new Socket();
     private ChatMessage message;
-    private ClienteService service;
+    private ClienteService service = new ClienteService();
 
     /**
      * Creates new form ClienteFrame
@@ -40,7 +40,7 @@ public class ClienteFrame extends javax.swing.JFrame {
 
         public ListenerSocket(Socket socket) {
             try {
-                this.input = new ObjectInputStream(socket.getInputStream());
+                input = new ObjectInputStream(socket.getInputStream());
             } catch (IOException ex) {
                 Logger.getLogger(ClienteFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -60,7 +60,7 @@ public class ClienteFrame extends javax.swing.JFrame {
                     } else if (action.equals(Action.DISCONNECT)) {
                         disconnect();
                         socket.close();
-                    } else if (action.equals(Action.SENDO_ONE)) {
+                    } else if (action.equals(Action.SEND_ONE)) {
                         receive(message);
                     } else if (action.equals(Action.USERS_ONINE)) {
                         refreshOnlines(message);
@@ -301,21 +301,21 @@ public class ClienteFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConectarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarActionPerformed
-        String name = this.txtNome.getText();
+        String name = txtNome.getText();
 
         if (!name.isEmpty()) {
-            this.message = new ChatMessage();
-            this.message.setAction(Action.CONNECT);
-            this.message.setName(name);
+            message = new ChatMessage();
+            message.setAction(Action.CONNECT);
+            message.setName(name);
 
             if (this.socket == null) {
-                this.service = new ClienteService();
-                this.socket = this.service.connect();
+                service = new ClienteService();
+                socket = service.connect();
 
                 new Thread(new ListenerSocket(this.socket)).start();
             }
 
-            this.service.send(message);
+            service.send(message);
 
         }
     }//GEN-LAST:event_btnConectarActionPerformed
@@ -323,7 +323,7 @@ public class ClienteFrame extends javax.swing.JFrame {
     private void btnSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSairActionPerformed
         this.message.setAction(Action.DISCONNECT);
         this.service.send(this.message);
-        disconnect();
+        //disconnect();
     }//GEN-LAST:event_btnSairActionPerformed
 
     private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
@@ -338,7 +338,7 @@ public class ClienteFrame extends javax.swing.JFrame {
 
         if (this.listOnlines.getSelectedIndex() > -1) {
             this.message.setNameReserved(this.listOnlines.getSelectedValue());
-            this.message.setAction(Action.SENDO_ONE);
+            this.message.setAction(Action.SEND_ONE);
             this.listOnlines.clearSelection();
         }else{
             this.message.setAction(Action.SEND_ALL);

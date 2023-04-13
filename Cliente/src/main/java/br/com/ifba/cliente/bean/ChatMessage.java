@@ -17,7 +17,7 @@ public class ChatMessage implements Serializable{
     private String name;
     private String text;
     private String nameReserved;
-    private Set<String> setOnlines = new HashSet<String>();
+    private Set<String> setOnlines = new HashSet<>();
     private Action action;
 
     public String getName() {
@@ -61,6 +61,6 @@ public class ChatMessage implements Serializable{
     }
     
     public enum Action {
-        CONNECT, DISCONNECT, SENDO_ONE, SEND_ALL, USERS_ONINE;
+        CONNECT, DISCONNECT, SEND_ONE, SEND_ALL, USERS_ONINE;
     }
 }

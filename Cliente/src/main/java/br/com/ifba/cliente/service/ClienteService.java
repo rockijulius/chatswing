@@ -23,7 +23,7 @@ public class ClienteService {
     public Socket connect(){
         try {                
             this.socket = new Socket("localhost", 5555);
-            this.output = new ObjectOutputStream(socket.getOutputStream());
+            output = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException ex) {
             Logger.getLogger(ClienteService.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -33,8 +33,8 @@ public class ClienteService {
     
     public void send(ChatMessage message){
         try {
-            output.writeObject(message);
-        } catch (IOException ex) {
+           output.writeObject(message);
+        } catch (IOException ex) { 
             Logger.getLogger(ClienteService.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

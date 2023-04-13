@@ -30,7 +30,7 @@ public class ServidorService {
 
     public ServidorService() {
         try {
-            serverSocket = new ServerSocket(12345);
+            serverSocket = new ServerSocket(5555);
 
             System.out.println("Servidor online.");
 
@@ -77,7 +77,7 @@ public class ServidorService {
                         disconnect(message, output);
                         sendOnlines();
                         return;
-                    } else if (action.equals(Action.SENDO_ONE)) {
+                    } else if (action.equals(Action.SEND_ONE)) {
                         sendOne(message);
                     } else if (action.equals(Action.SEND_ALL)) {
                         sendAll(message);
@@ -119,7 +119,7 @@ public class ServidorService {
         mapOnlines.remove(message.getName());
 
         message.setText("deixou o chat!");
-        message.setAction(Action.SENDO_ONE);
+        message.setAction(Action.SEND_ONE);
         sendAll(message);
         System.out.println(message.getName() + " saiu da sala.");
     }
@@ -148,7 +148,7 @@ public class ServidorService {
     private void sendAll(ChatMessage message) {
         for (Map.Entry<String, ObjectOutputStream> kv : mapOnlines.entrySet()) {
             if (kv.getKey().equals(message.getName())) {
-                message.setAction(Action.SENDO_ONE);
+                message.setAction(Action.SEND_ONE);
                 try {
                     kv.getValue().writeObject(message);
                 } catch (IOException ex) {
